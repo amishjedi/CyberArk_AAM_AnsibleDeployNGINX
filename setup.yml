@@ -36,6 +36,35 @@
       service:
           name: nginx
           state: started
+    - name: Create a directory if it does not exist
+      become: true
+      file:
+        path: "{{item}}"
+        state: directory
+      with_items:
+        - '/var/www/html/'
+        - '/var/www/html/images/'
+    - name: Copy random index.html
+      become: true
+      copy:
+        src: "{{ playbook_dir }}/nginx_web/index.{{item}}.html"
+        dest: '/var/www/html/index.html'
+      with_random_choice:
+        - yoda
+        - r2d2
+        - bb8
+        - c3po
+    - name: Copy images
+      become: true
+      copy:
+        src: "{{ playbook_dir }}/nginx_web/images/{{item}}"
+        dest: "/var/www/html/images/{{item}}"
+      with_items:
+        - 'yoda.webp'
+        - 'r2d2.gif'
+        - 'bb8.webp'
+        - 'c3po.webp'
+
 
 # Remove ssh keys post execution
 - hosts: local_machine

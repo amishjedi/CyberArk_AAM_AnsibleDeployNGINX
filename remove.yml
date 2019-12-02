@@ -37,6 +37,12 @@
         name: nginx 
         state: absent
         update_cache: yes
+        
+    - name: Clean nginx web artifacts
+      become: true
+      file:
+        state: absent
+        path: "/var/www/html/"
 
 # Remove ssh keys post execution 
 - hosts: local_machine
