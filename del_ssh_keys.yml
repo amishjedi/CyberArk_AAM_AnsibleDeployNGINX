@@ -1,0 +1,8 @@
+---
+- name: Get hosts 
+  debug: msg={{ machine_item }}
+
+- name: Remove file (delete file)
+  file:
+    path: "{{ playbook_dir }}/{{ machine_item }}.pem"
+    state: absent

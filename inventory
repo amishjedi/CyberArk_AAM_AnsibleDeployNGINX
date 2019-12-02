@@ -1,0 +1,14 @@
+[local_machine]
+localhost ansible_connection=local
+
+[AWS]
+ec2-x-x-x-x.compute-1.amazonaws.com #change
+ec2-x-x-x-x.compute-1.amazonaws.com #change
+ec2-x-x-x-x.compute-1.amazonaws.com #change
+ec2-x-x-x-x.compute-1.amazonaws.com #change
+
+
+[AWS:vars]
+ansible_connection=ssh
+cyberark_result_object='{{ lookup("cyberarkpassword", {"appid": "ansible", "query": "safe=Linux SSH Keys;folder=root;object={{ inventory_hostname }}", "output": "PassProps.UserName"}) }}' #change
+ansible_user="{{ cyberark_result_object[0]['passprops']['username'] }}"

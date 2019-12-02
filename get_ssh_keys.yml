@@ -1,0 +1,25 @@
+---
+- name: Get hosts 
+  debug: msg={{ machine_item }}
+- name: Fetch SSH Key content from CyberArk Vault
+  set_fact: 
+    aws_key: "{{ item.password }}"
+  with_cyberarkpassword:
+    appid: "ansible"
+    query: "safe=Linux SSH Keys;folder=root;object={{ machine_item }}"
+    output: "Password"
+  delegate_to: localhost
+  no_log: false
+
+- name: writing key contents to a temp file
+  copy:
+    dest: "{{ playbook_dir }}/{{ machine_item }}.pem"
+    content: "{{ aws_key }}"
+  delegate_to: localhost
+  changed_when: false
+  no_log: false
+
+- name: Change file ownership, group and permissions
+  file:
+    path: "{{ playbook_dir }}/{{ machine_item }}.pem"
+    mode: '0600'

@@ -1,0 +1,52 @@
+---
+# Get keys from CyberArk
+- hosts: local_machine
+  connection: local
+  gather_facts: true
+    
+  tasks:
+  - name: Get SSH Keys for each host in inventory
+    include_tasks: get_ssh_keys.yml
+    with_items:
+      - "{{groups['AWS']}}"
+    loop_control:
+      loop_var: machine_item
+
+# Start work on machines 
+- hosts: AWS
+  gather_facts: false
+
+  vars:
+    ansible_ssh_private_key_file: "{{ playbook_dir }}/{{inventory_hostname}}.pem"
+
+  tasks:
+    - name: apt update
+      become: true 
+      apt:
+        name: aptitude
+        force_apt_get: yes 
+    - name: Stop nginx
+      become: true
+      service:
+          name: nginx
+          state: stopped
+
+    - name: Remove nginx is at the latest version
+      become: true
+      apt: 
+        name: nginx 
+        state: absent
+        update_cache: yes
+
+# Remove ssh keys post execution 
+- hosts: local_machine
+  connection: local
+  gather_facts: true
+    
+  tasks:
+  - name: Get SSH Keys for each host in inventory
+    include_tasks: del_ssh_keys.yml
+    with_items:
+      - "{{groups['AWS']}}"
+    loop_control:
+      loop_var: machine_item
